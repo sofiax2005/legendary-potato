@@ -855,4 +855,3 @@ class SmartBinApp {
 }
 
 const app = new SmartBinApp();
-```
