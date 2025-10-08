@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartBin - Smart Waste Management</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
     <!-- Landing Page -->
@@ -112,27 +114,35 @@
                 </div>
             </section>
 
-            <!-- Educational Section -->
+            <!-- Learn Section -->
             <section class="education-section">
                 <div class="card">
                     <div class="card__body">
-                        <h3>Learn & Earn</h3>
+                        <h3>Learn</h3>
                         <div class="tutorial-grid">
                             <div class="tutorial-item">
                                 <span class="tutorial-icon">♻️</span>
                                 <div class="tutorial-content">
                                     <h4>Waste Segregation</h4>
-                                    <p>Learn proper sorting techniques</p>
+                                    <p>Learn proper sorting techniques for recycling</p>
                                 </div>
-                                <button class="btn btn--sm">Start</button>
+                                <button class="btn btn--sm" data-module="waste-segregation">Start</button>
                             </div>
                             <div class="tutorial-item">
                                 <span class="tutorial-icon">🌱</span>
                                 <div class="tutorial-content">
                                     <h4>Composting Basics</h4>
-                                    <p>Turn organic waste into gold</p>
+                                    <p>Turn organic waste into compost</p>
                                 </div>
-                                <button class="btn btn--sm">Start</button>
+                                <button class="btn btn--sm" data-module="composting-basics">Start</button>
+                            </div>
+                            <div class="tutorial-item">
+                                <span class="tutorial-icon">🔋</span>
+                                <div class="tutorial-content">
+                                    <h4>Hazardous Waste</h4>
+                                    <p>Handle batteries and electronics safely</p>
+                                </div>
+                                <button class="btn btn--sm" data-module="hazardous-waste">Start</button>
                             </div>
                         </div>
                     </div>
@@ -316,6 +326,58 @@
             <div class="camera-actions">
                 <button class="btn btn--primary" id="capture-photo">📷 Capture</button>
                 <button class="btn btn--outline close-overlay" data-target="photo-overlay">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Pickup Overlay -->
+    <div id="schedule-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="scanner-header">
+                <h3>Schedule Pickup</h3>
+                <button class="btn--icon close-overlay" data-target="schedule-overlay">✕</button>
+            </div>
+            <div class="calendar-container">
+                <div id="calendar"></div>
+                <div class="time-picker">
+                    <label for="pickup-time">Select Time:</label>
+                    <input type="time" id="pickup-time" value="10:00">
+                </div>
+            </div>
+            <div class="calendar-actions">
+                <button class="btn btn--primary" id="confirm-schedule">Confirm</button>
+                <button class="btn btn--outline close-overlay" data-target="schedule-overlay">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Overlay -->
+    <div id="map-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="scanner-header">
+                <h3>Find Nearby Bins</h3>
+                <button class="btn--icon close-overlay" data-target="map-overlay">✕</button>
+            </div>
+            <div id="map" style="height: 400px;"></div>
+            <div class="map-actions">
+                <button class="btn btn--outline close-overlay" data-target="map-overlay">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learn Module Overlay -->
+    <div id="learn-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="scanner-header">
+                <h3 id="learn-title">Learn</h3>
+                <button class="btn--icon close-overlay" data-target="learn Lucia</button>
+            </div>
+            <div class="learn-content" id="learn-content">
+                <!-- Populated by JS -->
+            </div>
+            <div class="learn-actions">
+                <button class="btn btn--primary" id="complete-module">Complete</button>
+                <button class="btn btn--outline close-overlay" data-target="learn-overlay">Close</button>
             </div>
         </div>
     </div>
