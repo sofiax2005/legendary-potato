@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBin - Smart Waste Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="screen active">
+        <div class="container">
+            <div class="landing-content">
+                <div class="logo-section">
+                    <h1 class="app-logo">SmartBin</h1>
+                    <p class="app-tagline">Smart Waste Management System</p>
+                </div>
+                
+                <div class="login-options">
+                    <button class="btn btn--primary btn--full-width" id="user-login-btn">
+                        <span>👤</span>
+                        User Login
+                    </button>
+                    <button class="btn btn--outline btn--full-width" id="municipal-login-btn">
+                        <span>🏛️</span>
+                        Municipal Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="user-dashboard" class="screen">
+        <header class="app-header">
+            <div class="header-content">
+                <h2>Welcome Back!</h2>
+                <div class="header-actions">
+                    <span class="network-status online">●</span>
+                    <button class="btn--icon" id="user-menu-btn">☰</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <div class="action-grid">
+                    <button class="action-card" id="qr-scan-btn">
+                        <div class="action-icon">📱</div>
+                        <span>Scan QR</span>
+                    </button>
+                    <button class="action-card" id="photo-capture-btn">
+                        <div class="action-icon">📷</div>
+                        <span>Photo ID</span>
+                    </button>
+                    <button class="action-card" id="schedule-pickup-btn">
+                        <div class="action-icon">🚛</div>
+                        <span>Schedule</span>
+                    </button>
+                    <button class="action-card" id="maps-btn">
+                        <div class="action-icon">🗺️</div>
+                        <span>Find Bins</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Rewards Section -->
+            <section class="rewards-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Your Rewards</h3>
+                        <div class="rewards-display">
+                            <div class="points-counter">
+                                <span class="points-value" id="total-points">1,247</span>
+                                <span class="points-label">Points</span>
+                            </div>
+                            <div class="level-info">
+                                <div class="level-badge">Eco Warrior</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 83%"></div>
+                                </div>
+                                <span class="next-level">253 to next level</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Recent Activity (Last 3 Days)</h3>
+                        <div class="activity-list" id="recent-activity">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Charts -->
+            <section class="analytics-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Weekly Analytics</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="weekly-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Educational Section -->
+            <section class="education-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Learn & Earn</h3>
+                        <div class="tutorial-grid">
+                            <div class="tutorial-item">
+                                <span class="tutorial-icon">♻️</span>
+                                <div class="tutorial-content">
+                                    <h4>Waste Segregation</h4>
+                                    <p>Learn proper sorting techniques</p>
+                                </div>
+                                <button class="btn btn--sm">Start</button>
+                            </div>
+                            <div class="tutorial-item">
+                                <span class="tutorial-icon">🌱</span>
+                                <div class="tutorial-content">
+                                    <h4>Composting Basics</h4>
+                                    <p>Turn organic waste into gold</p>
+                                </div>
+                                <button class="btn btn--sm">Start</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="dashboard">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" data-view="history">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-item" data-view="rewards">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Rewards</span>
+            </button>
+            <button class="nav-item" data-view="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Municipal Dashboard -->
+    <div id="municipal-dashboard" class="screen">
+        <header class="app-header">
+            <div class="header-content">
+                <h2>Municipal Control</h2>
+                <div class="header-actions">
+                    <span class="network-status online">●</span>
+                    <button class="btn--icon" id="municipal-menu-btn">☰</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Status Overview -->
+            <section class="status-overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">891.7</div>
+                        <div class="stat-label">Total Waste (kg)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Active Drivers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">16</div>
+                        <div class="stat-label">Hazard Alerts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">95%</div>
+                        <div class="stat-label">Bin Health</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Locality Analytics -->
+            <section class="locality-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Locality Waste Distribution</h3>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="locality-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Driver Management -->
+            <section class="drivers-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Driver Status</h3>
+                        <div class="driver-list" id="driver-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bin Monitoring -->
+            <section class="bins-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Bin Health Monitor</h3>
+                        <div class="bin-list" id="bin-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section class="alerts-section">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>Active Alerts</h3>
+                        <div class="alert-item priority-high">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-content">
+                                <h4>Low Battery Alert</h4>
+                                <p>BIN-003 at Industrial Zone - 23% battery</p>
+                                <span class="alert-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="alert-item priority-medium">
+                            <div class="alert-icon">🚨</div>
+                            <div class="alert-content">
+                                <h4>High Fill Level</h4>
+                                <p>BIN-001 at Main St & 5th - 95% full</p>
+                                <span class="alert-time">4 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="overview">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Overview</span>
+            </button>
+            <button class="nav-item" data-view="drivers">
+                <span class="nav-icon">🚛</span>
+                <span class="nav-label">Drivers</span>
+            </button>
+            <button class="nav-item" data-view="bins">
+                <span class="nav-icon">🗑️</span>
+                <span class="nav-label">Bins</span>
+            </button>
+            <button class="nav-item" data-view="alerts">
+                <span class="nav-icon">⚠️</span>
+                <span class="nav-label">Alerts</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- QR Scanner Overlay -->
+    <div id="qr-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="scanner-header">
+                <h3>Scan QR Code</h3>
+                <button class="btn--icon close-overlay" data-target="qr-overlay">✕</button>
+            </div>
+            <div class="scanner-viewport">
+                <div class="scanner-frame">
+                    <div class="scanner-corners"></div>
+                    <div class="scanner-line"></div>
+                </div>
+                <p class="scanner-instruction">Position QR code within the frame</p>
+            </div>
+            <div class="scanner-actions">
+                <button class="btn btn--primary" id="simulate-scan">Simulate Scan</button>
+                <button class="btn btn--outline close-overlay" data-target="qr-overlay">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Capture Overlay -->
+    <div id="photo-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="scanner-header">
+                <h3>Capture Waste Photo</h3>
+                <button class="btn--icon close-overlay" data-target="photo-overlay">✕</button>
+            </div>
+            <div class="camera-viewport">
+                <div class="camera-frame">
+                    <div class="crosshair"></div>
+                </div>
+                <p class="camera-instruction">Capture a clear photo of the waste</p>
+            </div>
+            <div class="camera-actions">
+                <button class="btn btn--primary" id="capture-photo">📷 Capture</button>
+                <button class="btn btn--outline close-overlay" data-target="photo-overlay">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="success-title">Success!</h3>
+            </div>
+            <div class="modal-body">
+                <p id="success-message">Operation completed successfully.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn--primary close-modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading hidden">
+        <div class="loading-spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
