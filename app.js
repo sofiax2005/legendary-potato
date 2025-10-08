@@ -1,4 +1,3 @@
-```javascript
 class SmartBinApp {
     constructor() {
         this.currentUser = null;
@@ -263,9 +262,11 @@ class SmartBinApp {
     }
     
     loadMunicipalDashboard() {
+        this.renderStatusOverview();
         this.renderDriverList();
         this.renderBinList();
         this.renderLocalityChart();
+        this.renderAlerts();
     }
     
     renderRecentActivity() {
@@ -411,6 +412,63 @@ class SmartBinApp {
             `;
             container.appendChild(binItem);
         });
+    }
+    
+    renderStatusOverview() {
+        const stats = [
+            { id: 'total-waste', value: this.data.municipalData.localities.reduce((sum, loc) => sum + loc.totalWaste, 0).toFixed(1), label: 'Total Waste (kg)' },
+            { id: 'active-drivers', value: this.data.municipalData.drivers.filter(d => d.status === 'Active').length, label: 'Active Drivers' },
+            { id: 'hazard-alerts', value: this.data.municipalData.binStatus.filter(b => b.fillLevel > 90 || b.battery < 30).length, label: 'Hazard Alerts' },
+            { id: 'bin-health', value: Math.round(this.data.municipalData.binStatus.reduce((sum, b) => sum + b.battery, 0) / this.data.municipalData.binStatus.length) + '%', label: 'Bin Health' }
+        ];
+
+        stats.forEach(stat => {
+            const valueElement = document.querySelector(`#${stat.id} .stat-value`);
+            if (valueElement) {
+                valueElement.textContent = stat.value;
+            }
+        });
+    }
+
+    renderAlerts() {
+        const container = document.getElementById('alerts-list');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.data.municipalData.binStatus.forEach(bin => {
+            if (bin.fillLevel > 90) {
+                const alertItem = document.createElement('div');
+                alertItem.className = 'alert-item priority-medium';
+                alertItem.innerHTML = `
+                    <div class="alert-icon">🚨</div>
+                    <div class="alert-content">
+                        <h4>High Fill Level</h4>
+                        <p>${bin.id} at ${bin.location} - ${bin.fillLevel}% full</p>
+                        <span class="alert-time">${this.getTimeAgo()}</span>
+                    </div>
+                `;
+                container.appendChild(alertItem);
+            }
+            if (bin.battery < 30) {
+                const alertItem = document.createElement('div');
+                alertItem.className = 'alert-item priority-high';
+                alertItem.innerHTML = `
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <h4>Low Battery Alert</h4>
+                        <p>${bin.id} at ${bin.location} - ${bin.battery}% battery</p>
+                        <span class="alert-time">${this.getTimeAgo()}</span>
+                    </div>
+                `;
+                container.appendChild(alertItem);
+            }
+        });
+    }
+
+    getTimeAgo() {
+        const minutes = Math.floor(Math.random() * 300) + 1;
+        return minutes < 60 ? `${minutes} minutes ago` : `${Math.floor(minutes / 60)} hours ago`;
     }
     
     showScheduleOverlay() {
