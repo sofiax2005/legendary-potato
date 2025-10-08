@@ -1,3 +1,4 @@
+```javascript
 class SmartBinApp {
     constructor() {
         this.currentUser = null;
@@ -423,45 +424,69 @@ class SmartBinApp {
         
         container.innerHTML = '';
         const today = new Date();
-        const month = today.getMonth();
-        const year = today.getFullYear();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
         
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay();
-        
-        let calendarHTML = `
-            <div class="calendar-header">
-                <span>${today.toLocaleString('default', { month: 'long' })} ${year}</span>
-            </div>
-            <div class="calendar-grid">
-                <div class="calendar-day">Sun</div>
-                <div class="calendar-day">Mon</div>
-                <div class="calendar-day">Tue</div>
-                <div class="calendar-day">Wed</div>
-                <div class="calendar-day">Thu</div>
-                <div class="calendar-day">Fri</div>
-                <div class="calendar-day">Sat</div>
-        `;
-        
-        for (let i = 0; i < firstDay; i++) {
-            calendarHTML += '<div class="calendar-date empty"></div>';
-        }
-        
-        for (let i = 1; i <= daysInMonth; i++) {
-            const date = new Date(year, month, i);
-            const isToday = date.toDateString() === today.toDateString();
-            calendarHTML += `<div class="calendar-date ${isToday ? 'today' : ''}" data-date="${date.toISOString()}">${i}</div>`;
-        }
-        
-        calendarHTML += '</div>';
-        container.innerHTML = calendarHTML;
-        
-        document.querySelectorAll('.calendar-date:not(.empty)').forEach(date => {
-            date.addEventListener('click', (e) => {
-                document.querySelectorAll('.calendar-date').forEach(d => d.classList.remove('selected'));
-                e.target.classList.add('selected');
+        const render = () => {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            
+            let calendarHTML = `
+                <div class="calendar-header">
+                    <button class="btn--icon" id="prev-month">◄</button>
+                    <span>${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} ${currentYear}</span>
+                    <button class="btn--icon" id="next-month">►</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day">Sun</div>
+                    <div class="calendar-day">Mon</div>
+                    <div class="calendar-day">Tue</div>
+                    <div class="calendar-day">Wed</div>
+                    <div class="calendar-day">Thu</div>
+                    <div class="calendar-day">Fri</div>
+                    <div class="calendar-day">Sat</div>
+            `;
+            
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += '<div class="calendar-date empty"></div>';
+            }
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(currentYear, currentMonth, i);
+                const isToday = date.toDateString() === today.toDateString();
+                calendarHTML += `<div class="calendar-date ${isToday ? 'today' : ''}" data-date="${date.toISOString()}">${i}</div>`;
+            }
+            
+            calendarHTML += '</div>';
+            container.innerHTML = calendarHTML;
+            
+            document.querySelectorAll('.calendar-date:not(.empty)').forEach(date => {
+                date.addEventListener('click', (e) => {
+                    document.querySelectorAll('.calendar-date').forEach(d => d.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                });
             });
-        });
+            
+            document.getElementById('prev-month')?.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                render();
+            });
+            
+            document.getElementById('next-month')?.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                render();
+            });
+        };
+        
+        render();
     }
     
     schedulePickup() {
@@ -503,7 +528,11 @@ class SmartBinApp {
             this.map.remove();
         }
         
-        this.map = L.map('map').setView([40.7128, -74.0060], 13);
+        // Calculate average coordinates for centering
+        const avgLat = this.data.municipalData.binStatus.reduce((sum, bin) => sum + bin.lat, 0) / this.data.municipalData.binStatus.length;
+        const avgLng = this.data.municipalData.binStatus.reduce((sum, bin) => sum + bin.lng, 0) / this.data.municipalData.binStatus.length;
+        
+        this.map = L.map('map').setView([avgLat || 40.7128, avgLng || -74.0060], 13);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -602,7 +631,7 @@ class SmartBinApp {
     showUserMenu() {
         const menuOptions = [
             'Profile Settings',
-            'Notification Preferences', 
+            'Notification Preferences',
             'Help & Support',
             'About SmartBin',
             'Logout'
@@ -621,7 +650,10 @@ class SmartBinApp {
             
             modalActions.innerHTML = '<button class="btn btn--outline close-modal">Close</button>';
             
-            messageElement.addEventListener('click', (e) => {
+            const newMessageElement = messageElement.cloneNode(true);
+            messageElement.parentNode.replaceChild(newMessageElement, messageElement);
+            
+            newMessageElement.addEventListener('click', (e) => {
                 const optionIndex = e.target.getAttribute('data-menu-option');
                 if (optionIndex !== null) {
                     const option = menuOptions[parseInt(optionIndex)];
@@ -659,7 +691,10 @@ class SmartBinApp {
             
             modalActions.innerHTML = '<button class="btn btn--outline close-modal">Close</button>';
             
-            messageElement.addEventListener('click', (e) => {
+            const newMessageElement = messageElement.cloneNode(true);
+            messageElement.parentNode.replaceChild(newMessageElement, messageElement);
+            
+            newMessageElement.addEventListener('click', (e) => {
                 const optionIndex = e.target.getAttribute('data-menu-option');
                 if (optionIndex !== null) {
                     const option = menuOptions[parseInt(optionIndex)];
@@ -732,768 +767,34 @@ class SmartBinApp {
     showLoading() {
         const loading = document.getElementById('loading');
         if (loading) {
-            loading.classList.removesheet
-:root {
-    --primary-color: #2e7d32; /* Green for eco-friendly theme */
-    --secondary-color: #4caf50;
-    --accent-color: #81c784;
-    --text-color: #212121;
-    --background-color: #f5f5f5;
-    --card-background: #ffffff;
-    --border-color: #e0e0e0;
-    --error-color: #d32f2f;
-    --warning-color: #ff9800;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', Arial, sans-serif;
-}
-
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
-}
-
-.screen {
-    display: none;
-    min-height: 100vh;
-    padding-bottom: 80px; /* Space for bottom nav */
-}
-
-.screen.active {
-    display: block;
-}
-
-.app-header {
-    background-color: var(--card-background);
-    padding: 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.network-status {
-    font-size: 12px;
-}
-
-.network-status.online::before {
-    content: '●';
-    color: var(--secondary-color);
-}
-
-.network-status.offline::before {
-    content: '●';
-    color: var(--error-color);
-}
-
-.btn--icon {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--text-color);
-}
-
-.btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.btn--primary {
-    background-color: var(--primary-color);
-    color: #fff;
-}
-
-.btn--primary:hover {
-    background-color: var(--secondary-color);
-}
-
-.btn--outline {
-    background: none;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-}
-
-.btn--outline:hover {
-    background-color: var(--primary-color);
-    color: #fff;
-}
-
-.btn--full-width {
-    width: 100%;
-}
-
-.btn--sm {
-    padding: 8px 16px;
-    font-size: 14px;
-}
-
-.landing-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-    gap: 24px;
-}
-
-.app-logo {
-    font-size: 48px;
-    color: var(--primary-color);
-    font-weight: 700;
-}
-
-.app-tagline {
-    font-size: 18px;
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-.login-options {
-    width: 100%;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.dashboard-content {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.card {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
-.card__body {
-    padding: 24px;
-}
-
-.action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px;
-}
-
-.action-card {
-    background-color: var(--card-background);
-    padding: 16px;
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    border: 1px solid var(--border-color);
-}
-
-.action-card:hover {
-    transform: translateY(-4px);
-}
-
-.action-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-    color: var(--primary-color);
-}
-
-.rewards-display {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-top: 16px;
-}
-
-.points-counter {
-    text-align: center;
-}
-
-.points-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.points-label {
-    font-size: 14px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.level-info {
-    flex: 1;
-    text-align: center;
-}
-
-.level-badge {
-    background-color: var(--accent-color);
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 14px;
-    margin-bottom: 8px;
-    display: inline-block;
-}
-
-.progress-bar {
-    background-color: var(--border-color);
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    background-color: var(--secondary-color);
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.next-level {
-    font-size: 12px;
-    color: var(--text-color);
-    opacity: 0.7;
-    margin-top: 4px;
-}
-
-.activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
-}
-
-.activity-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background-color: #fafafa;
-    border-radius: 8px;
-}
-
-.activity-details h4 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.activity-details p {
-    font-size: 14px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.activity-points {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--secondary-color);
-}
-
-.tutorial-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
-
-.tutorial-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background-color: #fafafa;
-    border-radius: 8px;
-}
-
-.tutorial-icon {
-    font-size: 24px;
-}
-
-.tutorial-content h4 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.tutorial-content p {
-    font-size: 14px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
-}
-
-.stat-card {
-    text-align: center;
-    padding: 16px;
-    background-color: var(--card-background);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.stat-label {
-    font-size: 14px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.driver-list, .bin-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
-}
-
-.driver-item, .bin-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background-color: #fafafa;
-    border-radius: 8px;
-}
-
-.item-info h4 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.item-info p {
-    font-size: 14px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-badge.active {
-    background-color: var(--accent-color);
-    color: #fff;
-}
-
-.status-badge.off-duty, .status-badge.low-battery {
-    background-color: var(--warning-color);
-    color: #fff;
-}
-
-.status-badge.high-fill {
-    background-color: var(--error-color);
-    color: #fff;
-}
-
-.alert-item {
-    display: flex;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 8px;
-    margin-top: 12px;
-}
-
-.alert-item.priority-high {
-    background-color: #ffebee;
-}
-
-.alert-item.priority-medium {
-    background-color: #fff3e0;
-}
-
-.alert-icon {
-    font-size: 24px;
-}
-
-.alert-content h4 {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
-
-.alert-content p {
-    font-size: 14px;
-}
-
-.alert-time {
-    font-size: 12px;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-.overlay.active {
-    display: flex;
-}
-
-.overlay-content {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 24px;
-}
-
-.scanner-header, .calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.scanner-viewport, .camera-viewport {
-    background-color: #000;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
-}
-
-.scanner-frame, .camera-frame {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 0 auto;
-    border: 2px solid var(--secondary-color);
-    border-radius: 8px;
-}
-
-.scanner-corners::before,
-.scanner-corners::after,
-.scanner-corners > div::before,
-.scanner-corners > div::after {
-    content: '';
-    position: absolute;
-    background-color: var(--secondary-color);
-}
-
-.scanner-corners::before {
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 2px;
-}
-
-.scanner-corners::after {
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 20px;
-}
-
-.scanner-corners > div::before {
-    bottom: 0;
-    right: 0;
-    width: 20px;
-    height: 2px;
-}
-
-.scanner-corners > div::after {
-    bottom: 0;
-    right: 0;
-    width: 2px;
-    height: 20px;
-}
-
-.scanner-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--secondary-color);
-    animation: scan 2s infinite;
-}
-
-@keyframes scan {
-    0% { top: 0; }
-    50% { top: 100%; }
-    100% { top: 0; }
-}
-
-.crosshair::before,
-.crosshair::after {
-    content: '';
-    position: absolute;
-    background-color: var(--secondary-color);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.crosshair::before {
-    width: 100px;
-    height: 2px;
-}
-
-.crosshair::after {
-    width: 2px;
-    height: 100px;
-}
-
-.scanner-instruction, .camera-instruction {
-    text-align: center;
-    margin-top: 16px;
-    color: #fff;
-    opacity: 0.8;
-}
-
-.scanner-actions, .camera-actions, .calendar-actions, .map-actions, .learn-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 16px;
-}
-
-.calendar-container {
-    padding: 16px;
-}
-
-.calendar-header {
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-top: 16px;
-}
-
-.calendar-day {
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.calendar-date {
-    text-align: center;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.calendar-date.empty {
-    background-color: #f5f5f5;
-}
-
-.calendar-date:not(.empty):hover {
-    background-color: var(--accent-color);
-    color: #fff;
-}
-
-.calendar-date.today {
-    border: 2px solid var(--primary-color);
-}
-
-.calendar-date.selected {
-    background-color: var(--secondary-color);
-    color: #fff;
-}
-
-.time-picker {
-    margin-top: 16px;
-    text-align: center;
-}
-
-.time-picker label {
-    font-size: 14px;
-    margin-right: 8px;
-}
-
-.time-picker input {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-}
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    padding: 24px;
-}
-
-.modal-header {
-    margin-bottom: 16px;
-}
-
-.modal-body {
-    margin-bottom: 16px;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-.loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.7);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 4000;
-}
-
-.loading.hidden {
-    display: none;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid var(--secondary-color);
-    border-top: 4px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading p {
-    color: #fff;
-    margin-top: 16px;
-}
-
-@media (max-width: 600px) {
-    .container {
-        padding: 0 8px;
+            loading.classList.remove('hidden');
+        }
     }
     
-    .btn {
-        padding: 10px 16px;
-        font-size: 14px;
+    hideLoading() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.classList.add('hidden');
+        }
     }
     
-    .action-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    updateNetworkStatus() {
+        const statusElement = document.querySelector('.network-status');
+        if (statusElement) {
+            statusElement.classList.remove('online', 'offline');
+            statusElement.classList.add(this.networkStatus);
+        }
     }
     
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    simulateNetworkChange() {
+        this.networkStatus = Math.random() > 0.2 ? 'online' : 'offline';
+        this.updateNetworkStatus();
+    }
+    
+    loadUserData() {
+        console.log('Loading user data...');
     }
 }
 
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--card-background);
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 0;
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-    z-index: 1000;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-color);
-    opacity: 0.7;
-}
-
-.nav-item.active {
-    color: var(--primary-color);
-    opacity: 1;
-}
-
-.nav-icon {
-    font-size: 24px;
-}
-
-.nav-label {
-    font-size: 12px;
-} this is coorect?
+const app = new SmartBinApp();
+```
